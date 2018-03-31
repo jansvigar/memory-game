@@ -1,12 +1,49 @@
 *,
 *::after,
 *::before {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html {
-    font-family: 'Fredoka One', 'Comic Sans MS', 'Comic Sans', cursive;
-    font-size: 16px;
+  font-family: "Fredoka One", "Comic Sans MS", "Comic Sans", cursive;
+  font-size: 16px;
+}
+
+li {
+  list-style-type: none;
+}
+
+.board {
+  display: flex;
+  flex-flow: row wrap;
+  max-width: 800px;
+  border: 1px solid black;
+}
+
+.card {
+  flex: 1 1 25%;
+  position: relative;
+  min-width: 120px;
+  height: 150px;
+  background-color: aqua;
+  border: 8px solid orange;
+}
+
+.card > div {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+}
+
+.card .front {
+  background-color: blue;
+}
+
+.card .back {
+  background-color: red;
+  z-index: 1;
 }
