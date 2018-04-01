@@ -20,15 +20,17 @@ li {
   flex-flow: row wrap;
   max-width: 800px;
   border: 1px solid black;
+  perspective: 800px;
 }
 
 .card {
-  flex: 1 1 25%;
+  flex: 1 1 20%;
   position: relative;
   min-width: 120px;
   height: 150px;
-  background-color: aqua;
-  border: 8px solid orange;
+  margin: 8px;
+  transform-style: preserve-3d;
+  transition: transform 1s;
 }
 
 .card > div {
@@ -41,9 +43,14 @@ li {
 
 .card .front {
   background-color: blue;
+  transform: rotateY(180deg);
 }
 
 .card .back {
   background-color: red;
   z-index: 1;
+}
+
+.card.flipped {
+    transform: rotateY(180deg);
 }
