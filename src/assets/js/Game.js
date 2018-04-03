@@ -60,13 +60,6 @@ function _handleClickedCard(event, cards, flippedCards) {
   const clickedElement = event.target,
     cardIndex = clickedElement.dataset.index,
     clickedCard = cards[cardIndex];
-<<<<<<< HEAD
-=======
-    cardIndex = clickedElement.dataset.index;
-  clickedCard = cards[cardIndex];
->>>>>>> a65c934... feat: add more game logics
-=======
->>>>>>> 730fbad... feat: add game logic
 
   Animation.flip(clickedElement);
   flippedCards.push(clickedCard);
