@@ -1,6 +1,6 @@
-import Animation from './animation';
+import Animation from "./animation";
 
-class Game {
+export default class Game {
   constructor() {
     this.cards = [
       { name: "a", imgURL: "" },
@@ -20,7 +20,10 @@ class Game {
       { name: "g", imgURL: "" },
       { name: "h", imgURL: "" }
     ];
-    this.flippedCards = [];
+    this.boardElement = document.querySelector(".board");
+    this.cardsToCheck = [];
+    this.numberOfFlippedCards = 0;
+    this._handleClickedCard = this._handleClickedCard.bind(this);
   }
 
   /** Fisher-Yates Shuffling Algorithm */
@@ -49,61 +52,78 @@ class Game {
 
   /** Method to start the game */
   start() {
-    const boardElement = document.querySelector(".board");
-    
-    _loadCardsToBoard(boardElement, this.cards);
+    this._loadCardsToBoard(this.boardElement, this.cards);
 
-    boardElement.addEventListener("click", (event) =>
-      _handleClickedCard(event, this.cards, this.flippedCards)
-    );
+    this.boardElement.addEventListener("click", this._handleClickedCard);
   }
-}
 
-export default Game;
+  _handleClickedCard(event) {
+    const clickedElement = event.target;
+    if(clickedElement.parentElement.classList.contains("flipped")) return;
+    Animation.flip(clickedElement);
 
-function _handleClickedCard(event, cards, flippedCards) {
-  const clickedElement = event.target,
-    cardIndex = clickedElement.parentElement.dataset.index,
-    clickedCard = cards[cardIndex];
-
-  Animation.flip(clickedElement);
-  flippedCards.push(clickedCard);
-  if (flippedCards.length > 1) _checkMatch(flippedCards[0], flippedCards[1]);
-}
-
-function _checkMatch(card1, card2) {
-  if (card1.name === card2.name) _handleCardMatch();
-  else _handleCardNotMatch();
-}
-
-function _handleCardMatch() {}
-
-function _handleCardNotMatch() {}
-
-function _loadCardsToBoard(board, cards) {
-  if (!cards.length) {
-    throw new Error("There are no card to load");
+    this.cardsToCheck.push(clickedElement.parentElement);
+    if (this.cardsToCheck.length === 2) {
+      const isMatched = this._checkMatch(...this.cardsToCheck);
+  
+      if (isMatched) {
+        this._handleCardMatch();
+        this.numberOfFlippedCards+=2;
+      }
+      else this._handleCardNotMatch(...this.cardsToCheck);
+  
+      this.cardsToCheck.length = 0;
+    }
+  
+    console.log(this.numberOfFlippedCards);
+  
+    if(this.numberOfFlippedCards===16) console.log("You win!!!");
   }
-  const fragment = document.createDocumentFragment();
-
-  cards.forEach((card, idx) => {
-    const listElement = document.createElement("li"),
-      frontDivElement = document.createElement("div"),
-      backDivElement = document.createElement("div");
-
-    listElement.classList.add("card");
-    listElement.setAttribute("data-index", idx);
-
-    frontDivElement.classList.add("front");
-    frontDivElement.textContent = card.name;
-    listElement.appendChild(frontDivElement);
-
-    backDivElement.classList.add("back");
-    backDivElement.textContent = "Back";
-    listElement.appendChild(backDivElement);
-
-    fragment.appendChild(listElement);
-  });
-
-  board.appendChild(fragment);
+  
+  _checkMatch(card1Element, card2Element) {
+    if (card1Element.dataset.name === card2Element.dataset.name) return true;
+    return false;
+  }
+  
+  _handleCardMatch() {
+    console.log("cards matched");
+  }
+  
+  _handleCardNotMatch(card1Element, card2Element) {
+    setTimeout(() => {
+      Animation.unflip(card1Element);
+      Animation.unflip(card2Element);
+    }, 1500);
+    console.log("cards not matched");
+  }
+  
+  _loadCardsToBoard() {
+    if (!this.cards.length) {
+      throw new Error("There are no card to load");
+    }
+    const fragment = document.createDocumentFragment();
+  
+    this.cards.forEach(card => {
+      const listElement = document.createElement("li"),
+        frontDivElement = document.createElement("div"),
+        backDivElement = document.createElement("div");
+  
+      listElement.classList.add("card");
+      listElement.setAttribute("data-name", card.name);
+  
+      frontDivElement.classList.add("front");
+      frontDivElement.textContent = card.name;
+      listElement.appendChild(frontDivElement);
+  
+      backDivElement.classList.add("back");
+      backDivElement.textContent = "Back";
+      listElement.appendChild(backDivElement);
+  
+      fragment.appendChild(listElement);
+    });
+  
+    this.boardElement.appendChild(fragment);
+  }
+  
 }
+
