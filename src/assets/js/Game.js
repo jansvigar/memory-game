@@ -1,24 +1,32 @@
 import Animation from "./animation";
+import dogPic1 from "/Users/jvigar/Documents/WebProjects/memory-game/src/assets/img/dog-pic-1.jpg";
+import dogPic2 from "/Users/jvigar/Documents/WebProjects/memory-game/src/assets/img/dog-pic-2.jpg";
+import dogPic3 from "/Users/jvigar/Documents/WebProjects/memory-game/src/assets/img/dog-pic-3.jpg";
+import dogPic4 from "/Users/jvigar/Documents/WebProjects/memory-game/src/assets/img/dog-pic-4.jpg";
+import dogPic5 from "/Users/jvigar/Documents/WebProjects/memory-game/src/assets/img/dog-pic-5.jpg";
+import dogPic6 from "/Users/jvigar/Documents/WebProjects/memory-game/src/assets/img/dog-pic-6.jpg";
+import dogPic7 from "/Users/jvigar/Documents/WebProjects/memory-game/src/assets/img/dog-pic-7.jpg";
+import dogPic8 from "/Users/jvigar/Documents/WebProjects/memory-game/src/assets/img/dog-pic-8.jpg";
 
 export default class Game {
   constructor() {
     this.cards = [
-      { name: "a", imgURL: "" },
-      { name: "b", imgURL: "" },
-      { name: "c", imgURL: "" },
-      { name: "d", imgURL: "" },
-      { name: "e", imgURL: "" },
-      { name: "f", imgURL: "" },
-      { name: "g", imgURL: "" },
-      { name: "h", imgURL: "" },
-      { name: "a", imgURL: "" },
-      { name: "b", imgURL: "" },
-      { name: "c", imgURL: "" },
-      { name: "d", imgURL: "" },
-      { name: "e", imgURL: "" },
-      { name: "f", imgURL: "" },
-      { name: "g", imgURL: "" },
-      { name: "h", imgURL: "" }
+      { name: "dog-pic-1", imgURL: dogPic1 },
+      { name: "dog-pic-2", imgURL: dogPic2 },
+      { name: "dog-pic-3", imgURL: dogPic3 },
+      { name: "dog-pic-4", imgURL: dogPic4 },
+      { name: "dog-pic-5", imgURL: dogPic5 },
+      { name: "dog-pic-6", imgURL: dogPic6 },
+      { name: "dog-pic-7", imgURL: dogPic7 },
+      { name: "dog-pic-8", imgURL: dogPic8 },
+      { name: "dog-pic-1", imgURL: dogPic1 },
+      { name: "dog-pic-2", imgURL: dogPic2 },
+      { name: "dog-pic-3", imgURL: dogPic3 },
+      { name: "dog-pic-4", imgURL: dogPic4 },
+      { name: "dog-pic-5", imgURL: dogPic5 },
+      { name: "dog-pic-6", imgURL: dogPic6 },
+      { name: "dog-pic-7", imgURL: dogPic7 },
+      { name: "dog-pic-8", imgURL: dogPic8 }
     ];
     this.boardElement = document.querySelector(".board");
     this.cardsToCheck = [];
@@ -106,17 +114,18 @@ export default class Game {
     this.cards.forEach(card => {
       const listElement = document.createElement("li"),
         frontDivElement = document.createElement("div"),
-        backDivElement = document.createElement("div");
+        backDivElement = document.createElement("div"),
+        frontImgElement = document.createElement("img");
   
       listElement.classList.add("card");
       listElement.setAttribute("data-name", card.name);
   
+      frontImgElement.src = card.imgURL;
       frontDivElement.classList.add("front");
-      frontDivElement.textContent = card.name;
+      frontDivElement.appendChild(frontImgElement);
       listElement.appendChild(frontDivElement);
   
       backDivElement.classList.add("back");
-      backDivElement.textContent = "Back";
       listElement.appendChild(backDivElement);
   
       fragment.appendChild(listElement);
