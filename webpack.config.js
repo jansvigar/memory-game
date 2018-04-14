@@ -21,11 +21,17 @@ module.exports = {
         use: [
           {
             loader: 'file-loader',
-            // options: {
-            //   bypassOnDebug: true,
-            // },
+            options: {
+              name: '[path][name].[ext]?[hash]'
+            }
           },
         ],
+      },
+      {
+        test: /\.(html)$/,
+        use: {
+          loader: 'html-loader'
+        }
       }
     ]
   },

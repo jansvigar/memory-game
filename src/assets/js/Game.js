@@ -10,7 +10,7 @@ import dogPic8 from "../img/dog-pic-8.jpg";
 
 export default class Game {
   constructor() {
-    this.cards = [
+    this.cards = [  
       { name: "dog-pic-1", imgURL: dogPic1 },
       { name: "dog-pic-2", imgURL: dogPic2 },
       { name: "dog-pic-3", imgURL: dogPic3 },
