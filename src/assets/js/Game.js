@@ -31,6 +31,10 @@ export default class Game {
     this.boardElement = document.querySelector(".board");
     this.cardsToCheck = [];
     this.numberOfFlippedCards = 0;
+    this.moves = 0;
+    this.rating = '★★★';
+    this.seconds = 0; 
+    this.timerInterval = null;
     this._handleClickedCard = this._handleClickedCard.bind(this);
   }
 
@@ -61,13 +65,15 @@ export default class Game {
   /** Method to start the game */
   start() {
     this._loadCardsToBoard(this.boardElement, this.cards);
-
     this.boardElement.addEventListener("click", this._handleClickedCard);
+    this._startTimer();
   }
 
   _handleClickedCard(event) {
     const clickedElement = event.target;
+    if(clickedElement.nodeName !== 'DIV') return;
     if(clickedElement.parentElement.classList.contains("flipped")) return;
+
     Animation.flip(clickedElement);
 
     this.cardsToCheck.push(clickedElement.parentElement);
@@ -82,8 +88,8 @@ export default class Game {
   
       this.cardsToCheck.length = 0;
     }
-  
-    console.log(this.numberOfFlippedCards);
+
+    this._updateScorePanel();
   
     if(this.numberOfFlippedCards===16) console.log("You win!!!");
   }
@@ -102,7 +108,31 @@ export default class Game {
       Animation.unflip(card1Element);
       Animation.unflip(card2Element);
     }, 1500);
-    console.log("cards not matched");
+  }
+
+  _updateScorePanel() {
+    document.querySelector('div.moves').textContent = ++this.moves;
+    if(this.moves >= 48) {
+      this.rating = '★';
+    } else if(this.moves >= 24) {
+      this.rating = '★★';
+    } 
+    document.querySelector('div.rating').textContent = this.rating;
+  }
+
+  _startTimer() {
+    var self = this;
+    this.timerInterval = setInterval(function() {
+      self.seconds++;
+      let minutes = Math.floor(self.seconds/60);
+      let seconds = self.seconds % 60;
+      seconds = `${seconds < 10 ? '0' + seconds : seconds}`;
+      document.querySelector('div.time').textContent = `${minutes}:${seconds}`;
+    }, 1000);
+  }
+
+  _stopTimer() {
+    clearInterval(this.timerInterval);
   }
   
   _loadCardsToBoard() {
