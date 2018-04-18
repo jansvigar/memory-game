@@ -29,18 +29,23 @@ export default class Game {
       { name: "dog-pic-8", imgURL: dogPic8 }
     ];
     this.boardElement = document.querySelector(".board");
+    this._initialize();
+    this.start = this.start.bind(this);
+    this._handleClickedCard = this._handleClickedCard.bind(this);
+  }
+
+  _initialize() {
     this.cardsToCheck = [];
     this.numberOfFlippedCards = 0;
     this.moves = 0;
     this.rating = '★★★';
     this.seconds = 0; 
     this.timerInterval = null;
-    this._handleClickedCard = this._handleClickedCard.bind(this);
   }
 
   /** Fisher-Yates Shuffling Algorithm */
   /** https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array/2450976#2450976 */
-  shuffleCards() {
+  _shuffleCards() {
     let currentIndex = this.cards.length - 1,
       temp,
       randomIndex;
@@ -64,14 +69,25 @@ export default class Game {
 
   /** Method to start the game */
   start() {
+    const modal = document.querySelector(".modal-container");
+    if(modal && modal.style.display === "block") {
+      modal.removeEventListener("click", this.start);
+      modal.style.display = "none";
+    }
+    
+    this._shuffleCards();
     this._loadCardsToBoard(this.boardElement, this.cards);
     this.boardElement.addEventListener("click", this._handleClickedCard);
+    this._initialize();
+    this._updateScorePanel();
     this._startTimer();
   }
 
   _handleClickedCard(event) {
     const clickedElement = event.target;
-    if(clickedElement.nodeName !== 'DIV') return;
+    if(clickedElement.nodeName !== 'DIV' 
+        || !clickedElement.parentElement.classList.contains("card")
+      ) return;
     if(clickedElement.parentElement.classList.contains("flipped")) return;
 
     Animation.flip(clickedElement);
@@ -81,17 +97,15 @@ export default class Game {
       const isMatched = this._checkMatch(...this.cardsToCheck);
   
       if (isMatched) {
-        this._handleCardMatch();
         this.numberOfFlippedCards+=2;
+        this._handleCardMatch();
       }
       else this._handleCardNotMatch(...this.cardsToCheck);
   
       this.cardsToCheck.length = 0;
     }
-
+    this.moves++;
     this._updateScorePanel();
-  
-    if(this.numberOfFlippedCards===16) console.log("You win!!!");
   }
   
   _checkMatch(card1Element, card2Element) {
@@ -100,7 +114,7 @@ export default class Game {
   }
   
   _handleCardMatch() {
-    console.log("cards matched");
+    if(this.numberOfFlippedCards===16) this._displayWinModal();
   }
   
   _handleCardNotMatch(card1Element, card2Element) {
@@ -110,11 +124,17 @@ export default class Game {
     }, 1500);
   }
 
+  _displayWinModal() {
+    this._stopTimer();
+    document.querySelector('.modal-container').style.display = 'block';
+    document.querySelector('.btnRestart').addEventListener("click", this.start);
+  }
+
   _updateScorePanel() {
-    document.querySelector('div.moves').textContent = ++this.moves;
-    if(this.moves >= 48) {
+    document.querySelector('div.moves').textContent = this.moves;
+    if(this.moves > 50) {
       this.rating = '★';
-    } else if(this.moves >= 24) {
+    } else if(this.moves > 32) {
       this.rating = '★★';
     } 
     document.querySelector('div.rating').textContent = this.rating;
@@ -139,6 +159,8 @@ export default class Game {
     if (!this.cards.length) {
       throw new Error("There are no card to load");
     }
+    const modal = document.querySelector(".modal-container");
+    this.boardElement.innerHTML = '';
     const fragment = document.createDocumentFragment();
   
     this.cards.forEach(card => {
@@ -160,8 +182,9 @@ export default class Game {
   
       fragment.appendChild(listElement);
     });
-  
+    
     this.boardElement.appendChild(fragment);
+    this.boardElement.appendChild(modal);
   }
   
 }
