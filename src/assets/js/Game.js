@@ -9,8 +9,8 @@ import dogPic7 from "../img/dog-pic-7.jpg";
 import dogPic8 from "../img/dog-pic-8.jpg";
 
 export default class Game {
-  constructor() {
-    this.cards = [  
+  constructor(player) {
+    this.cards = [
       { name: "dog-pic-1", imgURL: dogPic1 },
       { name: "dog-pic-2", imgURL: dogPic2 },
       { name: "dog-pic-3", imgURL: dogPic3 },
@@ -29,6 +29,8 @@ export default class Game {
       { name: "dog-pic-8", imgURL: dogPic8 }
     ];
     this.boardElement = document.querySelector(".board");
+    this.player = player;
+    console.log(player);
     this._initialize();
     this.start = this.start.bind(this);
     this._handleClickedCard = this._handleClickedCard.bind(this);
@@ -38,8 +40,8 @@ export default class Game {
     this.cardsToCheck = [];
     this.numberOfFlippedCards = 0;
     this.moves = 0;
-    this.rating = '★★★';
-    this.seconds = 0; 
+    this.rating = "★★★";
+    this.seconds = 0;
     this.timerInterval = null;
   }
 
@@ -70,11 +72,11 @@ export default class Game {
   /** Method to start the game */
   start() {
     const modal = document.querySelector(".modal-container");
-    if(modal && modal.style.display === "block") {
+    if (modal && modal.style.display === "block") {
       modal.removeEventListener("click", this.start);
       modal.style.display = "none";
     }
-    
+
     this._shuffleCards();
     this._loadCardsToBoard(this.boardElement, this.cards);
     this.boardElement.addEventListener("click", this._handleClickedCard);
@@ -85,38 +87,39 @@ export default class Game {
 
   _handleClickedCard(event) {
     const clickedElement = event.target;
-    if(clickedElement.nodeName !== 'DIV' 
-        || !clickedElement.parentElement.classList.contains("card")
-      ) return;
-    if(clickedElement.parentElement.classList.contains("flipped")) return;
+    if (
+      clickedElement.nodeName !== "DIV" ||
+      !clickedElement.parentElement.classList.contains("card")
+    )
+      return;
+    if (clickedElement.parentElement.classList.contains("flipped")) return;
 
     Animation.flip(clickedElement);
 
     this.cardsToCheck.push(clickedElement.parentElement);
     if (this.cardsToCheck.length === 2) {
       const isMatched = this._checkMatch(...this.cardsToCheck);
-  
+
       if (isMatched) {
-        this.numberOfFlippedCards+=2;
+        this.numberOfFlippedCards += 2;
         this._handleCardMatch();
-      }
-      else this._handleCardNotMatch(...this.cardsToCheck);
-  
+      } else this._handleCardNotMatch(...this.cardsToCheck);
+
       this.cardsToCheck.length = 0;
     }
     this.moves++;
     this._updateScorePanel();
   }
-  
+
   _checkMatch(card1Element, card2Element) {
     if (card1Element.dataset.name === card2Element.dataset.name) return true;
     return false;
   }
-  
+
   _handleCardMatch() {
-    if(this.numberOfFlippedCards===16) this._displayWinModal();
+    if (this.numberOfFlippedCards === 16) this._displayWinModal();
   }
-  
+
   _handleCardNotMatch(card1Element, card2Element) {
     setTimeout(() => {
       Animation.unflip(card1Element);
@@ -126,66 +129,74 @@ export default class Game {
 
   _displayWinModal() {
     this._stopTimer();
-    document.querySelector('.modal-container').style.display = 'block';
-    document.querySelector('.btnRestart').addEventListener("click", this.start);
+    document.querySelector(".modal-container").style.display = "block";
+    document.querySelector(".btnRestart").addEventListener("click", this.start);
+    const playerScore =
+      JSON.parse(localStorage.getItem("MEMORY_GAME_SCORE")) || [];
+    playerScore.push({
+      player: this.player,
+      moves: this.moves,
+      rating: this.rating,
+      seconds: this.seconds
+    });
+    localStorage.setItem("MEMORY_GAME_SCORE", JSON.stringify(playerScore));
+    console.log(localStorage);
   }
 
   _updateScorePanel() {
-    document.querySelector('div.moves').textContent = this.moves;
-    if(this.moves > 50) {
-      this.rating = '★';
-    } else if(this.moves > 32) {
-      this.rating = '★★';
-    } 
-    document.querySelector('div.rating').textContent = this.rating;
+    document.querySelector("div.moves").textContent = this.moves;
+    if (this.moves > 50) {
+      this.rating = "★";
+    } else if (this.moves > 32) {
+      this.rating = "★★";
+    }
+    document.querySelector("div.rating").textContent = this.rating;
   }
 
   _startTimer() {
     var self = this;
     this.timerInterval = setInterval(function() {
       self.seconds++;
-      let minutes = Math.floor(self.seconds/60);
+      let minutes = Math.floor(self.seconds / 60);
       let seconds = self.seconds % 60;
-      seconds = `${seconds < 10 ? '0' + seconds : seconds}`;
-      document.querySelector('div.time').textContent = `${minutes}:${seconds}`;
+      seconds = `${seconds < 10 ? "0" + seconds : seconds}`;
+      document.querySelector("div.time").textContent = `${minutes}:${seconds}`;
     }, 1000);
   }
 
   _stopTimer() {
     clearInterval(this.timerInterval);
   }
-  
+
   _loadCardsToBoard() {
     if (!this.cards.length) {
       throw new Error("There are no card to load");
     }
     const modal = document.querySelector(".modal-container");
-    this.boardElement.innerHTML = '';
+    this.boardElement.innerHTML = "";
     const fragment = document.createDocumentFragment();
-  
+
     this.cards.forEach(card => {
       const listElement = document.createElement("li"),
         frontDivElement = document.createElement("div"),
         backDivElement = document.createElement("div"),
         frontImgElement = document.createElement("img");
-  
+
       listElement.classList.add("card");
       listElement.setAttribute("data-name", card.name);
-  
+
       frontImgElement.src = card.imgURL;
       frontDivElement.classList.add("front");
       frontDivElement.appendChild(frontImgElement);
       listElement.appendChild(frontDivElement);
-  
+
       backDivElement.classList.add("back");
       listElement.appendChild(backDivElement);
-  
+
       fragment.appendChild(listElement);
     });
-    
+
     this.boardElement.appendChild(fragment);
     this.boardElement.appendChild(modal);
   }
-  
 }
-

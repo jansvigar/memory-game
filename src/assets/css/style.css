@@ -59,8 +59,64 @@ body {
   text-align: center;
 }
 
-.board-container {
+.game-form {
   display: flex;
+  flex-flow: column nowrap;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 50px;
+  border-radius: 8px;
+}
+
+.game-form>* {
+  margin-top: 20px;
+  font: inherit;
+}
+
+.game-form>label {
+  color: #333;
+  font-size: 2rem;
+}
+
+.game-form>input {
+  font-size: 2rem;
+  color: #A9220B;
+  text-align: center;
+  background: transparent;
+  border: 0;
+  padding: 12px;
+  border-bottom: 1px solid #111;
+}
+
+.game-form>button {
+  font-size: 1.5rem;
+  letter-spacing: 4px;
+  border: 1px solid #111;
+  border-radius: 8px;
+  padding: 15px;
+  cursor: pointer;
+  box-shadow: 3px 3px 12px -2px rgba(0, 0, 0, 0.75);
+}
+
+.game-form>button.btn-start {
+  background: #0B43A9;
+  color: #ddd;
+}
+
+.game-form>button.btn-leaderboard {
+  background: #E0835D;
+  color: #ddd;
+}
+
+.game-form>button:hover {
+  background: rgb(33, 79, 167);
+}
+
+.game-form>button.btn-leaderboard:hover {
+  background: rgb(219, 119, 80);
+}
+
+.board-container {
+  display: none;
 }
 
 .score-panel {
