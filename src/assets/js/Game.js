@@ -30,7 +30,6 @@ export default class Game {
     ];
     this.boardElement = document.querySelector(".board");
     this.player = player;
-    console.log(player);
     this._initialize();
     this.start = this.start.bind(this);
     this._handleClickedCard = this._handleClickedCard.bind(this);
@@ -71,12 +70,6 @@ export default class Game {
 
   /** Method to start the game */
   start() {
-    const modal = document.querySelector(".modal-container");
-    if (modal && modal.style.display === "block") {
-      modal.removeEventListener("click", this.start);
-      modal.style.display = "none";
-    }
-
     this._shuffleCards();
     this._loadCardsToBoard(this.boardElement, this.cards);
     this.boardElement.addEventListener("click", this._handleClickedCard);
@@ -93,7 +86,7 @@ export default class Game {
     )
       return;
     if (clickedElement.parentElement.classList.contains("flipped")) return;
-
+    this.moves++;
     Animation.flip(clickedElement);
 
     this.cardsToCheck.push(clickedElement.parentElement);
@@ -107,7 +100,7 @@ export default class Game {
 
       this.cardsToCheck.length = 0;
     }
-    this.moves++;
+
     this._updateScorePanel();
   }
 
@@ -130,17 +123,27 @@ export default class Game {
   _displayWinModal() {
     this._stopTimer();
     document.querySelector(".modal-container").style.display = "block";
-    document.querySelector(".btnRestart").addEventListener("click", this.start);
-    const playerScore =
+    document.querySelector(".btnRestart").addEventListener("click", this._handleRestart);
+    const playerScores =
       JSON.parse(localStorage.getItem("MEMORY_GAME_SCORE")) || [];
-    playerScore.push({
+
+    playerScores.push({
       player: this.player,
       moves: this.moves,
       rating: this.rating,
       seconds: this.seconds
     });
-    localStorage.setItem("MEMORY_GAME_SCORE", JSON.stringify(playerScore));
-    console.log(localStorage);
+    localStorage.setItem("MEMORY_GAME_SCORE", JSON.stringify(playerScores));
+  }
+
+  _handleRestart() {
+    const modal = document.querySelector(".modal-container");
+    if (modal && modal.style.display === "block") {
+      modal.removeEventListener("click", this.start);
+      modal.style.display = "none";
+    }
+    document.querySelector(".board-container").style.display = "none";
+    document.querySelector(".form-container").style.display = "block";
   }
 
   _updateScorePanel() {
