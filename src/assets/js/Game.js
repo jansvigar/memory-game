@@ -9,7 +9,7 @@ import dogPic7 from "../img/dog-pic-7.jpg";
 import dogPic8 from "../img/dog-pic-8.jpg";
 
 export default class Game {
-  constructor(player) {
+  constructor() {
     this.cards = [
       { name: "dog-pic-1", imgURL: dogPic1 },
       { name: "dog-pic-2", imgURL: dogPic2 },
@@ -29,9 +29,9 @@ export default class Game {
       { name: "dog-pic-8", imgURL: dogPic8 }
     ];
     this.boardElement = document.querySelector(".board");
-    this.player = player;
+    this.player = document.querySelector(".input-name").value || "Unknown";
+
     this._initialize();
-    this.start = this.start.bind(this);
     this._handleClickedCard = this._handleClickedCard.bind(this);
   }
 
@@ -70,19 +70,21 @@ export default class Game {
 
   /** Method to start the game */
   start() {
+    this._initialize();
+    this._updateScorePanel();
     this._shuffleCards();
     this._loadCardsToBoard(this.boardElement, this.cards);
     this.boardElement.addEventListener("click", this._handleClickedCard);
-    this._initialize();
-    this._updateScorePanel();
     this._startTimer();
   }
 
   _handleClickedCard(event) {
+    event.stopPropagation();
     const clickedElement = event.target;
     if (
       clickedElement.nodeName !== "DIV" ||
-      !clickedElement.parentElement.classList.contains("card")
+      !clickedElement.parentElement.classList.contains("card") ||
+      !clickedElement.classList.contains("back")
     )
       return;
     if (clickedElement.parentElement.classList.contains("flipped")) return;
@@ -120,9 +122,7 @@ export default class Game {
       Animation.unhighlight(card2Element);
     }, 1500);
 
-    setTimeout(() => {
-      if (this.numberOfFlippedCards === 16) this._displayWinModal();
-    }, 2000);
+    if (this.numberOfFlippedCards === 16) this._displayWinModal();
   }
 
   _handleCardNotMatch(card1Element, card2Element) {
@@ -139,32 +139,36 @@ export default class Game {
     setTimeout(() => {
       Animation.unflip(card1Element);
       Animation.unflip(card2Element);
-      
     }, 1800);
   }
 
   _displayWinModal() {
-    this._stopTimer();
-    document.querySelector(".modal-container").style.display = "block";
-    document.querySelector(".btnRestart").addEventListener("click", this._handleRestart);
-    const playerScores =
-      JSON.parse(localStorage.getItem("MEMORY_GAME_SCORE")) || [];
+    setTimeout(() => {
+      this._stopTimer();
+      this.boardElement.removeEventListener("click", this._handleClickedCard);
+      document.querySelector(".modal-container").style.display = "block";
+      document
+        .querySelector(".btnRestart")
+        .addEventListener("click", this._handleRestart);
+      const playerScores =
+        JSON.parse(localStorage.getItem("MEMORY_GAME_SCORE")) || [];
 
-    playerScores.push({
-      player: this.player,
-      moves: this.moves,
-      rating: this.rating,
-      seconds: this.seconds
-    });
-    localStorage.setItem("MEMORY_GAME_SCORE", JSON.stringify(playerScores));
+      playerScores.push({
+        player: this.player,
+        moves: this.moves,
+        rating: this.rating,
+        seconds: this.seconds
+      });
+      localStorage.setItem("MEMORY_GAME_SCORE", JSON.stringify(playerScores));
+    }, 2000);
   }
 
   _handleRestart() {
     const modal = document.querySelector(".modal-container");
-    if (modal && modal.style.display === "block") {
-      modal.removeEventListener("click", this.start);
-      modal.style.display = "none";
-    }
+    modal
+      .querySelector(".btnRestart")
+      .removeEventListener("click", this._handleRestart);
+    modal.style.display = "none";
     document.querySelector(".board-container").style.display = "none";
     document.querySelector(".form-container").style.display = "block";
   }
