@@ -95,7 +95,7 @@ export default class Game {
 
       if (isMatched) {
         this.numberOfFlippedCards += 2;
-        this._handleCardMatch();
+        this._handleCardMatch(...this.cardsToCheck);
       } else this._handleCardNotMatch(...this.cardsToCheck);
 
       this.cardsToCheck.length = 0;
@@ -109,15 +109,38 @@ export default class Game {
     return false;
   }
 
-  _handleCardMatch() {
-    if (this.numberOfFlippedCards === 16) this._displayWinModal();
+  _handleCardMatch(card1Element, card2Element) {
+    setTimeout(() => {
+      Animation.highlight(card1Element.querySelector("div.front"));
+      Animation.highlight(card2Element.querySelector("div.front"));
+    }, 1000);
+
+    setTimeout(() => {
+      Animation.unhighlight(card1Element);
+      Animation.unhighlight(card2Element);
+    }, 1500);
+
+    setTimeout(() => {
+      if (this.numberOfFlippedCards === 16) this._displayWinModal();
+    }, 2000);
   }
 
   _handleCardNotMatch(card1Element, card2Element) {
     setTimeout(() => {
+      Animation.shake(card1Element);
+      Animation.shake(card2Element);
+    }, 1000);
+
+    setTimeout(() => {
+      Animation.unshake(card1Element);
+      Animation.unshake(card2Element);
+    }, 1500);
+
+    setTimeout(() => {
       Animation.unflip(card1Element);
       Animation.unflip(card2Element);
-    }, 1500);
+      
+    }, 1800);
   }
 
   _displayWinModal() {

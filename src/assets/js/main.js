@@ -39,7 +39,9 @@ function updateLeaderboard() {
         if(a.seconds > b.seconds) return 1;
         return 0;
     })
-    console.log(playerScores);
+    if(playerScores.length > 10) playerScores.splice(10);
+    localStorage.setItem("MEMORY_GAME_SCORE", JSON.stringify(playerScores));
+
     const fragment = document.createDocumentFragment();
     playerScores.forEach((score, index) => {
         const tr = document.createElement("tr"),
@@ -64,7 +66,7 @@ function updateLeaderboard() {
         fragment.appendChild(tr);
     });
 
-    document.querySelector(".leaderboard tbody").appendChild(fragment);
+    tbody.appendChild(fragment);
 }
 
 function formatTime(seconds) {
