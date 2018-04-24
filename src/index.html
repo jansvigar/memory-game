@@ -37,14 +37,20 @@
                 </div>
                 <div>
                     <h2>Time</h2>
-                    <div class="time">0:00</div>
+                    <div class="time">00:00</div>
+                </div>
+                <div>
+                    <button class="btnReset">Restart Game</button>
                 </div>
             </div>
             <ul class="board">
                 <div class="modal-container">
                     <div class="modal">
-                        <h3>You win!</h3>
-                        <button class="btnRestart">Restart Game</button>
+                        <h3>Congratulations,<br>You WIN!</h3>
+                        <p>Time spent: <span id="player-time"></span></p>
+                        <p>Your rating: <span id="player-rating"></span></p>
+                        <button class="btnRestart">Play Again</button>
+                        <button class="btnQuit">Quit Game</button>
                     </div>
                 </div>
             </ul>

@@ -1,4 +1,5 @@
 import Animation from "./animation";
+import Utils from "./utils";
 import dogPic1 from "../img/dog-pic-1.jpg";
 import dogPic2 from "../img/dog-pic-2.jpg";
 import dogPic3 from "../img/dog-pic-3.jpg";
@@ -33,6 +34,7 @@ export default class Game {
 
     this._initialize();
     this._handleClickedCard = this._handleClickedCard.bind(this);
+    this._handleRestart = this._handleRestart.bind(this);
   }
 
   _initialize() {
@@ -42,6 +44,9 @@ export default class Game {
     this.rating = "★★★";
     this.seconds = 0;
     this.timerInterval = null;
+    document.querySelector("div.moves").textContent = this.moves;
+    document.querySelector("div.time").textContent = "00:00";
+    document.querySelector("div.rating").textContent = this.rating;
   }
 
   /** Fisher-Yates Shuffling Algorithm */
@@ -70,12 +75,12 @@ export default class Game {
 
   /** Method to start the game */
   start() {
-    this._initialize();
-    this._updateScorePanel();
     this._shuffleCards();
     this._loadCardsToBoard(this.boardElement, this.cards);
-    this.boardElement.addEventListener("click", this._handleClickedCard);
+    this._initialize();
     this._startTimer();
+    this.boardElement.addEventListener("click", this._handleClickedCard);
+    document.querySelector(".btnReset").addEventListener("click", this._handleRestart);
   }
 
   _handleClickedCard(event) {
@@ -84,10 +89,13 @@ export default class Game {
     if (
       clickedElement.nodeName !== "DIV" ||
       !clickedElement.parentElement.classList.contains("card") ||
-      !clickedElement.classList.contains("back")
+      !clickedElement.classList.contains("back") ||
+      clickedElement.parentElement.classList.contains("flipped")
     )
       return;
-    if (clickedElement.parentElement.classList.contains("flipped")) return;
+
+    if (this.cardsToCheck.length >= 2) return;
+
     this.moves++;
     Animation.flip(clickedElement);
 
@@ -100,7 +108,7 @@ export default class Game {
         this._handleCardMatch(...this.cardsToCheck);
       } else this._handleCardNotMatch(...this.cardsToCheck);
 
-      this.cardsToCheck.length = 0;
+      setTimeout(() => (this.cardsToCheck.length = 0), 2000);
     }
 
     this._updateScorePanel();
@@ -143,13 +151,20 @@ export default class Game {
   }
 
   _displayWinModal() {
+    this._stopTimer();
     setTimeout(() => {
-      this._stopTimer();
       this.boardElement.removeEventListener("click", this._handleClickedCard);
-      document.querySelector(".modal-container").style.display = "block";
+      const modal = document.querySelector(".modal-container");
+      modal.querySelector("#player-time").textContent = Utils.formatTime(this.seconds);
+      modal.querySelector("#player-rating").textContent = this.rating;
       document
         .querySelector(".btnRestart")
         .addEventListener("click", this._handleRestart);
+      document
+        .querySelector(".btnQuit")
+        .addEventListener("click", this._handleQuit);
+      modal.style.display = "block";
+
       const playerScores =
         JSON.parse(localStorage.getItem("MEMORY_GAME_SCORE")) || [];
 
@@ -164,10 +179,26 @@ export default class Game {
   }
 
   _handleRestart() {
+    this._stopTimer();
     const modal = document.querySelector(".modal-container");
     modal
       .querySelector(".btnRestart")
       .removeEventListener("click", this._handleRestart);
+      modal
+      .querySelector(".btnQuit")
+      .removeEventListener("click", this._handleQuit);
+    modal.style.display = "none";
+    this.start();
+  }
+
+  _handleQuit() {
+    const modal = document.querySelector(".modal-container");
+    modal
+      .querySelector(".btnRestart")
+      .removeEventListener("click", this._handleRestart);
+      modal
+      .querySelector(".btnQuit")
+      .removeEventListener("click", this._handleQuit);
     modal.style.display = "none";
     document.querySelector(".board-container").style.display = "none";
     document.querySelector(".form-container").style.display = "block";
@@ -187,10 +218,7 @@ export default class Game {
     var self = this;
     this.timerInterval = setInterval(function() {
       self.seconds++;
-      let minutes = Math.floor(self.seconds / 60);
-      let seconds = self.seconds % 60;
-      seconds = `${seconds < 10 ? "0" + seconds : seconds}`;
-      document.querySelector("div.time").textContent = `${minutes}:${seconds}`;
+      document.querySelector("div.time").textContent = Utils.formatTime(self.seconds);
     }, 1000);
   }
 
