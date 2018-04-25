@@ -1,3 +1,8 @@
+/**
+ * Change the seconds to ##:## format
+ * @param {number} seconds 
+ * @return {string} formattedTime
+ */
 function formatTime(seconds) {
     let minutesTxt, secondsTxt;
 

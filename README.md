@@ -10,6 +10,8 @@ This is a Udacity Front-end Nanodegree project to build a memory game from scrat
 
 Node.js and NPM are required to start developing. Node.js can be downloaded from https://nodejs.org/en/. NPM comes with Node.js.
 
+There are other development dependencies like Webpack, Babel, AutoPrefixer and some webpack loaders and plugins
+
 ### Clone this repo
 
 ```
